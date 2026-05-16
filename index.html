@@ -3,18 +3,21 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>समाचार नामा — Samachar Nama</title>
+<title>Flash24 — Real-time News Digest</title>
 <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
 <style>
   :root {
     --ink: #ffffff;
-    --paper: #0a0f1e;
-    --accent: #00aaff;
-    --gold: #38bdf8;
+    --paper: #0a0d15;
+    --accent: #00ff88;
+    --accent2: #ff006e;
+    --accent3: #00d9ff;
+    --gold: #ffd60a;
     --muted: #94a3b8;
-    --border: #1e3a5f;
-    --card-bg: #0f1f3d;
-    --glow: 0 0 18px rgba(0,170,255,0.25);
+    --border: #1a2d4d;
+    --card-bg: #0f1b2e;
+    --glow: 0 0 30px rgba(0,255,136,0.25);
+    --glow2: 0 0 30px rgba(0,217,255,0.25);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,23 +28,49 @@
     font-family: 'IBM Plex Mono', monospace;
     min-height: 100vh;
     background-image:
-      radial-gradient(ellipse at 20% 20%, rgba(0,100,255,0.12) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 80%, rgba(0,200,255,0.08) 0%, transparent 60%),
-      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(0,150,255,0.04) 28px);
+      radial-gradient(ellipse at 20% 20%, rgba(0,255,136,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(255,0,110,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 50% 50%, rgba(0,217,255,0.05) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(0,255,136,0.02) 28px);
+    transition: background-color 0.3s ease;
+  }
+
+  body.light-mode {
+    --paper: #f5f5f5;
+    --ink: #0a0d15;
+    --accent: #00cc66;
+    --accent2: #ff1744;
+    --accent3: #0099ff;
+    --card-bg: #ffffff;
+    --border: #e0e0e0;
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(0,200,100,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(255,20,100,0.08) 0%, transparent 60%);
   }
 
   header {
-    border-bottom: 2px solid var(--border);
+    border-bottom: 3px solid var(--accent);
     padding: 18px 32px 12px;
     display: flex;
     align-items: flex-end;
     gap: 20px;
-    background: rgba(10,15,30,0.95);
+    background: linear-gradient(135deg, rgba(10,13,21,0.95), rgba(15,27,46,0.95));
     backdrop-filter: blur(12px);
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 2px 24px rgba(0,120,255,0.15);
+    box-shadow: 0 4px 40px rgba(0,255,136,0.15);
+    animation: slideDown 0.6s ease;
+  }
+
+  body.light-mode header {
+    background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(245,245,245,0.98));
+    box-shadow: 0 4px 40px rgba(0,150,100,0.1);
+  }
+
+  @keyframes slideDown {
+    from { transform: translateY(-40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
   }
 
   .masthead {
@@ -53,7 +82,19 @@
     color: var(--ink);
   }
 
-  .masthead span { color: var(--accent); text-shadow: 0 0 20px rgba(0,170,255,0.7); }
+  .masthead span { 
+    background: linear-gradient(135deg, var(--accent), var(--accent3), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 15px rgba(0,255,136,0.5));
+    animation: glow 3s ease-in-out infinite;
+  }
+
+  @keyframes glow {
+    0%, 100% { filter: drop-shadow(0 0 15px rgba(0,255,136,0.5)); }
+    50% { filter: drop-shadow(0 0 25px rgba(0,217,255,0.8)); }
+  }
 
   .tagline {
     font-size: 0.65rem;
@@ -65,46 +106,154 @@
     line-height: 1.6;
   }
 
+  .header-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .toggle-btn, .lang-btn {
+    background: transparent;
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    padding: 7px 14px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+    white-space: nowrap;
+    border-radius: 2px;
+  }
+
+  .toggle-btn:hover, .lang-btn:hover {
+    background: rgba(0,255,136,0.1);
+    box-shadow: 0 0 15px rgba(0,255,136,0.4);
+    transform: translateY(-2px);
+  }
+
+  .toggle-btn:active, .lang-btn:active {
+    transform: translateY(1px);
+  }
+
   .main-layout {
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 28px 20px 60px;
     display: grid;
-    grid-template-rows: auto auto 1fr;
+    grid-template-rows: auto auto auto 1fr;
     gap: 28px;
+    animation: fadeIn 0.6s ease 0.2s both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    margin: 0;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, var(--card-bg), rgba(0,255,136,0.05));
+    border: 1.5px solid var(--accent);
+    padding: 16px;
+    border-radius: 2px;
+    text-align: center;
+    box-shadow: var(--glow);
+    animation: scaleIn 0.6s ease 0.3s both;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .stat-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 40px rgba(0,255,136,0.4);
+  }
+
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .stat-number {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--accent);
+    text-shadow: 0 0 10px rgba(0,255,136,0.5);
+  }
+
+  .stat-label {
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 6px;
   }
 
   .prompt-box {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
+    background: linear-gradient(135deg, var(--card-bg), rgba(0,217,255,0.05));
+    border: 1.5px solid var(--accent3);
     border-top: 2px solid var(--accent);
     padding: 22px 24px;
     position: relative;
-    box-shadow: var(--glow);
+    box-shadow: 0 0 30px rgba(0,217,255,0.15);
+    animation: slideUp 0.6s ease 0.4s both;
+    border-radius: 2px;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .prompt-box::before {
     content: '⬛ प्रॉम्प्ट कंसोल';
     font-size: 0.6rem;
     letter-spacing: 4px;
-    color: var(--muted);
+    color: var(--accent);
     display: block;
     margin-bottom: 12px;
-    border-bottom: 1px solid #1e3a5f;
+    border-bottom: 1px solid var(--border);
     padding-bottom: 8px;
+    text-shadow: 0 0 10px rgba(0,255,136,0.3);
   }
 
   .prompt-row {
     display: flex;
     gap: 10px;
     align-items: flex-end;
+    margin-bottom: 12px;
+  }
+
+  .search-filter {
+    flex: 1;
+    background: rgba(0,20,50,0.5);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    color: #e2f0ff;
+    border-radius: 2px;
+    outline: none;
+    transition: all 0.3s;
+  }
+
+  .search-filter:focus {
+    border-color: var(--accent3);
+    box-shadow: 0 0 15px rgba(0,217,255,0.3);
+    background: rgba(0,50,100,0.3);
   }
 
   textarea {
     flex: 1;
     background: rgba(0,20,50,0.5);
     border: 1px solid var(--border);
-    border-radius: 0;
+    border-radius: 2px;
     padding: 10px 14px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.82rem;
@@ -115,77 +264,185 @@
     line-height: 1.6;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
-  textarea:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(0,170,255,0.2); }
+
+  textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 15px rgba(0,255,136,0.2);
+    background: rgba(0,50,100,0.4);
+  }
+
   textarea::placeholder { color: #3a5a7a; }
 
+  .button-group {
+    display: flex;
+    gap: 8px;
+  }
+
   .run-btn {
-    background: linear-gradient(135deg, #0070cc, #00aaff);
-    color: #fff;
+    background: linear-gradient(135deg, #00cc44, #00ff88);
+    color: #0a0d15;
     border: none;
     padding: 10px 22px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.2s;
+    transition: all 0.3s;
     height: 44px;
     align-self: flex-end;
-    box-shadow: 0 0 16px rgba(0,150,255,0.4);
+    box-shadow: 0 0 20px rgba(0,255,136,0.5);
+    border-radius: 2px;
   }
-  .run-btn:hover { background: linear-gradient(135deg, #0088ff, #00ccff); box-shadow: 0 0 28px rgba(0,180,255,0.6); }
-  .run-btn:active { transform: scale(0.97); }
-  .run-btn:disabled { background: #1a3a5a; box-shadow: none; cursor: wait; }
+
+  .run-btn:hover {
+    background: linear-gradient(135deg, #00ff88, #00ffaa);
+    box-shadow: 0 0 35px rgba(0,255,136,0.8);
+    transform: translateY(-2px);
+  }
+
+  .run-btn:active {
+    transform: translateY(1px);
+  }
+
+  .run-btn:disabled {
+    background: #1a3a5a;
+    box-shadow: none;
+    cursor: wait;
+    opacity: 0.5;
+  }
+
+  .sound-btn {
+    background: transparent;
+    border: 1px solid var(--accent2);
+    color: var(--accent2);
+    width: 44px;
+    height: 44px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 2px;
+  }
+
+  .sound-btn:hover {
+    background: rgba(255,0,110,0.1);
+    box-shadow: 0 0 15px rgba(255,0,110,0.3);
+  }
+
+  .sound-btn.active {
+    background: rgba(255,0,110,0.2);
+    box-shadow: 0 0 20px rgba(255,0,110,0.5);
+  }
+
+  .presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .preset-chip {
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+    border-radius: 20px;
+  }
+
+  .preset-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,255,136,0.1);
+    box-shadow: 0 0 12px rgba(0,255,136,0.3);
+    transform: scale(1.05);
+  }
 
   .section-label {
     font-size: 0.6rem;
     letter-spacing: 5px;
     text-transform: uppercase;
-    color: var(--muted);
-    border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-    padding: 5px 0;
+    color: var(--accent);
+    border-top: 1px solid var(--accent);
+    border-bottom: 1px solid var(--accent);
+    padding: 8px 0;
     margin-bottom: 0;
+    text-shadow: 0 0 8px rgba(0,255,136,0.3);
+    animation: slideIn 0.6s ease 0.5s both;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
   }
 
   .news-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
   }
 
   .news-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
+    background: linear-gradient(135deg, var(--card-bg), rgba(0,217,255,0.08));
+    border: 1.5px solid var(--border);
     border-top: 3px solid var(--accent);
-    padding: 18px 18px 14px;
-    animation: fadeSlide 0.4s ease both;
+    padding: 20px;
+    animation: cardBounce 0.6s ease both;
     position: relative;
     overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border-radius: 2px;
+    cursor: pointer;
   }
+
+  @keyframes cardBounce {
+    from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
   .news-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 32px rgba(0,150,255,0.2);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 50px rgba(0,255,136,0.25), 0 0 40px rgba(0,217,255,0.2);
+    border-color: var(--accent);
+  }
+
+  .news-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s;
+  }
+
+  .news-card:hover::before {
+    transform: scaleX(1);
   }
 
   .news-card::after {
     content: '';
     position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent), transparent);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s;
-  }
-  .news-card:hover::after { transform: scaleX(1); }
-
-  @keyframes fadeSlide {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at var(--mx, 50%) var(--my, 50%), rgba(0,255,136,0.1), transparent 80%);
+    pointer-events: none;
   }
 
   .card-tag {
@@ -193,23 +450,31 @@
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--accent);
-    font-weight: 600;
-    margin-bottom: 8px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-shadow: 0 0 8px rgba(0,255,136,0.4);
   }
 
   .card-title {
     font-family: 'Playfair Display', serif;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     font-weight: 700;
     line-height: 1.35;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     color: var(--ink);
+    transition: color 0.3s;
+  }
+
+  .news-card:hover .card-title {
+    color: var(--accent);
+    text-shadow: 0 0 10px rgba(0,255,136,0.3);
   }
 
   .card-body {
     font-size: 0.78rem;
-    line-height: 1.7;
+    line-height: 1.8;
     color: #94b8d8;
+    margin-bottom: 12px;
   }
 
   .card-footer {
@@ -218,14 +483,40 @@
     color: var(--muted);
     letter-spacing: 1px;
     border-top: 1px solid var(--border);
-    padding-top: 8px;
+    padding-top: 10px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .share-btn {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--accent2);
+    color: var(--accent2);
+    padding: 6px 8px;
+    font-size: 0.65rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 2px;
+  }
+
+  .share-btn:hover {
+    background: rgba(255,0,110,0.1);
+    box-shadow: 0 0 12px rgba(255,0,110,0.3);
   }
 
   .loading-box {
     text-align: center;
-    padding: 50px 20px;
+    padding: 60px 20px;
     font-size: 0.75rem;
     letter-spacing: 3px;
     color: var(--accent);
@@ -235,67 +526,94 @@
 
   @keyframes pulse {
     0%, 100% { opacity: 1; }
-    50%       { opacity: 0.4; }
+    50% { opacity: 0.4; }
+  }
+
+  .loading-spinner {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--accent);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 
   .error-box {
-    background: rgba(0,50,100,0.4);
-    border: 1px solid var(--accent);
-    padding: 16px 20px;
+    background: rgba(255,0,110,0.1);
+    border: 1.5px solid var(--accent2);
+    padding: 20px;
     font-size: 0.8rem;
-    color: var(--accent);
+    color: var(--accent2);
+    border-radius: 2px;
+    animation: shake 0.5s;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
   }
 
   .empty-state {
     text-align: center;
-    padding: 60px 20px;
+    padding: 80px 20px;
     color: var(--muted);
+    animation: fadeIn 0.6s;
   }
-  .empty-state .big { font-size: 2.5rem; margin-bottom: 10px; }
-  .empty-state p { font-size: 0.78rem; letter-spacing: 1px; line-height: 1.8; color: #3a6a9a; }
 
-  .presets {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 12px;
+  .empty-state .big {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    animation: float 3s ease-in-out infinite;
   }
-  .preset-chip {
-    background: transparent;
-    border: 1px solid #1e4a70;
-    padding: 4px 12px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.68rem;
-    cursor: pointer;
-    color: var(--muted);
-    transition: all 0.15s;
-    letter-spacing: 0.5px;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
   }
-  .preset-chip:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,150,255,0.08); box-shadow: 0 0 8px rgba(0,150,255,0.2); }
+
+  .empty-state p {
+    font-size: 0.78rem;
+    letter-spacing: 1px;
+    line-height: 1.8;
+    color: #3a6a9a;
+  }
 
   .ticker-wrap {
     overflow: hidden;
     background: linear-gradient(90deg, #001f4d, #003a8c, #001f4d);
-    color: #7dd3fc;
-    padding: 5px 0;
+    color: #00ff88;
+    padding: 8px 0;
     font-size: 0.65rem;
     letter-spacing: 2px;
   }
+
   .ticker-inner {
     display: inline-block;
     white-space: nowrap;
-    animation: scroll-ticker 25s linear infinite;
+    animation: scroll-ticker 30s linear infinite;
   }
+
   @keyframes scroll-ticker {
     from { transform: translateX(100vw); }
-    to   { transform: translateX(-100%); }
+    to { transform: translateX(-100%); }
   }
 
   @media (max-width: 600px) {
     header { flex-wrap: wrap; gap: 8px; }
     .tagline { margin-left: 0; text-align: left; }
     .prompt-row { flex-direction: column; }
+    .button-group { width: 100%; flex-direction: column; }
     .run-btn { width: 100%; }
+    .sound-btn { width: 100%; }
+    .news-grid { grid-template-columns: 1fr; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
@@ -303,30 +621,60 @@
 
 <div class="ticker-wrap">
   <span class="ticker-inner" id="ticker">
-    🌍 समाचार नामा — दुनिया की ताज़ा खबरें &nbsp;|&nbsp; AI-Powered News Engine &nbsp;|&nbsp; अपना प्रॉम्प्ट लिखें और खबरें पाएं &nbsp;|&nbsp; World · Politics · Science · Tech · Sports &nbsp;|&nbsp; ✦ ✦ ✦
+    ⚡ Flash24 — दुनिया की ताज़ा खबरें &nbsp;|&nbsp; AI-Powered News Engine &nbsp;|&nbsp; अपना प्रॉम्प्ट लिखें और खबरें पाएं &nbsp;|&nbsp; World · Politics · Science · Tech · Sports &nbsp;|&nbsp; ⚡ ⚡ ⚡ &nbsp;|&nbsp; 🚀 REAL-TIME NEWS 🚀
   </span>
 </div>
 
 <header>
   <div>
-    <div class="masthead" id="mastheadText">समाचार<span> नामा</span></div>
-    <div style="font-size:0.7rem;color:var(--muted);letter-spacing:2px;margin-top:3px;" id="mastheadSub">SAMACHAR NAMA</div>
+    <div class="masthead" id="mastheadText">Flash<span>24</span></div>
+    <div style="font-size:0.7rem;color:var(--muted);letter-spacing:2px;margin-top:3px;" id="mastheadSub">REAL-TIME NEWS DIGEST</div>
   </div>
   <div class="tagline">
     AI — Powered<br>
     NEWS DIGEST<br>
     <span id="dateline">—</span>
   </div>
-  <button id="langBtn" onclick="toggleLang()" style="margin-left:auto;background:transparent;border:1px solid var(--accent);color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:0.72rem;padding:7px 16px;cursor:pointer;letter-spacing:1px;transition:all 0.2s;white-space:nowrap;">🇮🇳 हिंदी</button>
+  <div class="header-controls">
+    <button class="sound-btn active" id="soundBtn" title="Toggle sound effects">🔊</button>
+    <button class="toggle-btn" onclick="toggleTheme()" title="Toggle light/dark mode">🌓</button>
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()" title="Change language">🇮🇳 हिंदी</button>
+  </div>
 </header>
 
 <div class="main-layout">
 
+  <!-- Stats Bar -->
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-card" onclick="incrementStat('articles')">
+      <div class="stat-number" id="stat-articles">0</div>
+      <div class="stat-label" id="stat-label-articles">खबरें</div>
+    </div>
+    <div class="stat-card" onclick="incrementStat('searches')">
+      <div class="stat-number" id="stat-searches">0</div>
+      <div class="stat-label" id="stat-label-searches">सर्च</div>
+    </div>
+    <div class="stat-card" onclick="incrementStat('shared')">
+      <div class="stat-number" id="stat-shared">0</div>
+      <div class="stat-label" id="stat-label-shared">शेयर</div>
+    </div>
+    <div class="stat-card" onclick="incrementStat('online')">
+      <div class="stat-number" id="stat-online">247</div>
+      <div class="stat-label" id="stat-label-online">ऑनलाइन</div>
+    </div>
+  </div>
+
   <!-- Prompt Console -->
   <div class="prompt-box">
     <div class="prompt-row">
-      <textarea id="promptInput" rows="3" placeholder="यहाँ अपना प्रॉम्प्ट लिखें..."></textarea>
+      <input type="text" id="searchFilter" class="search-filter" placeholder="🔍 खबरें फ़िल्टर करें...">
       <button class="run-btn" id="runBtn" onclick="fetchNews()">▶ चलाएं</button>
+    </div>
+    <div class="prompt-row">
+      <textarea id="promptInput" rows="3" placeholder="यहाँ अपना प्रॉम्प्ट लिखें..."></textarea>
+      <div class="button-group">
+        <button class="run-btn" id="runBtn2" onclick="fetchNews()" style="flex:1">▶ चलाएं</button>
+      </div>
     </div>
     <div class="presets">
       <span id="quickLabel" style="font-size:0.6rem;color:var(--muted);letter-spacing:2px;align-self:center;">त्वरित: </span>
@@ -353,6 +701,13 @@
 
 <script>
   var lang = 'hi';
+  var soundEnabled = true;
+  var stats = {
+    articles: 0,
+    searches: 0,
+    shared: 0,
+    online: 247
+  };
 
   var presets = {
     hi: [
@@ -375,10 +730,11 @@
 
   const ui = {
     hi: {
-      masthead: 'समाचार<span> नामा</span>',
-      sub: 'SAMACHAR NAMA',
+      masthead: 'Flash<span>24</span>',
+      sub: 'REAL-TIME NEWS DIGEST',
       langBtn: '🇬🇧 English',
       placeholder: 'यहाँ अपना प्रॉम्प्ट लिखें... जैसे: आज की 6 बड़ी खबरें दो',
+      searchPlaceholder: '🔍 खबरें फ़िल्टर करें...',
       runBtn: '▶ चलाएं',
       quickLabel: 'त्वरित: ',
       sectionDefault: '⬛ प्रतीक्षा करें — प्रॉम्प्ट लिखें और खबरें पाएं',
@@ -390,14 +746,16 @@
       found: (n, p) => `⬛ ${n} खबरें मिलीं — Topic: "${p}"`,
       errLabel: '⬛ खबरें लाने में समस्या हुई',
       errMsg: 'खबरें लाने में समस्या हुई। दोबारा कोशिश करें।',
-      ticker: '🌍 समाचार नामा — दुनिया की ताज़ा खबरें &nbsp;|&nbsp; AI-Powered News Engine &nbsp;|&nbsp; अपना प्रॉम्प्ट लिखें और खबरें पाएं &nbsp;|&nbsp; World · Politics · Science · Tech · Sports &nbsp;|&nbsp; ✦ ✦ ✦',
+      ticker: '⚡ Flash24 — दुनिया की ताज़ा खबरें &nbsp;|&nbsp; AI-Powered News Engine &nbsp;|&nbsp; अपना प्रॉम्प्ट लिखें और खबरें पाएं &nbsp;|&nbsp; World · Politics · Science · Tech · Sports &nbsp;|&nbsp; ⚡ ⚡ ⚡',
+      statLabels: { articles: 'खबरें', searches: 'सर्च', shared: 'शेयर', online: 'ऑनलाइन' },
       systemPrompt: `You are a Hindi news generator. Respond with ONLY a valid JSON array, no markdown, no explanation. Each item: tag (Hindi category), headline (Hindi), summary (Hindi, 2-3 sentences), source (known agency), time (e.g. 2 घंटे पहले). Return 4-6 items. Example: [{"tag":"विश्व","headline":"...","summary":"...","source":"NDTV","time":"1 घंटे पहले"}]`
     },
     en: {
-      masthead: 'Samachar<span> Nama</span>',
-      sub: 'WORLD NEWS DIGEST',
+      masthead: 'Flash<span>24</span>',
+      sub: 'REAL-TIME NEWS DIGEST',
       langBtn: '🇮🇳 हिंदी',
       placeholder: 'Type your prompt here... e.g. Give me top 6 world news today',
+      searchPlaceholder: '🔍 Filter news...',
       runBtn: '▶ GO',
       quickLabel: 'QUICK: ',
       sectionDefault: '⬛ WAITING — WRITE A PROMPT AND GET NEWS',
@@ -409,10 +767,53 @@
       found: (n, p) => `⬛ ${n} articles found — Topic: "${p}"`,
       errLabel: '⬛ Error fetching news',
       errMsg: 'Could not fetch news. Please try again.',
-      ticker: '🌍 SAMACHAR NAMA — World News In Your Language &nbsp;|&nbsp; AI-Powered News Engine &nbsp;|&nbsp; Type a prompt and get news &nbsp;|&nbsp; World · Politics · Science · Tech · Sports &nbsp;|&nbsp; ✦ ✦ ✦',
+      ticker: '⚡ Flash24 — World News In Your Language &nbsp;|&nbsp; AI-Powered News Engine &nbsp;|&nbsp; Type a prompt and get news &nbsp;|&nbsp; World · Politics · Science · Tech · Sports &nbsp;|&nbsp; ⚡ ⚡ ⚡',
+      statLabels: { articles: 'Articles', searches: 'Searches', shared: 'Shared', online: 'Online' },
       systemPrompt: `You are an English news generator. Respond with ONLY a valid JSON array, no markdown, no explanation. Each item: tag (category in English), headline (English), summary (English, 2-3 sentences), source (known agency like Reuters/AP/BBC), time (e.g. 2 hours ago). Return 4-6 items. Example: [{"tag":"WORLD","headline":"...","summary":"...","source":"Reuters","time":"1 hour ago"}]`
     }
   };
+
+  // Sound effects
+  function playSound(type) {
+    if (!soundEnabled) return;
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    switch(type) {
+      case 'click':
+        oscillator.frequency.value = 800;
+        gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.1);
+        break;
+      case 'success':
+        oscillator.frequency.value = 1200;
+        gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.2);
+        break;
+      case 'error':
+        oscillator.frequency.value = 300;
+        gain.gain.setValueAtTime(0.15, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+        break;
+    }
+  }
+
+  function toggleSoundBtn() {
+    soundEnabled = !soundEnabled;
+    document.getElementById('soundBtn').classList.toggle('active');
+    playSound('click');
+  }
+
+  document.getElementById('soundBtn').addEventListener('click', toggleSoundBtn);
 
   // Date
   const now = new Date();
@@ -425,36 +826,84 @@
     document.getElementById('mastheadSub').textContent = t.sub;
     document.getElementById('langBtn').textContent = t.langBtn;
     document.getElementById('promptInput').placeholder = t.placeholder;
+    document.getElementById('searchFilter').placeholder = t.searchPlaceholder;
     document.getElementById('runBtn').textContent = t.runBtn;
+    document.getElementById('runBtn2').textContent = t.runBtn;
     document.getElementById('quickLabel').textContent = t.quickLabel;
     document.getElementById('sectionLabel').textContent = t.sectionDefault;
     document.getElementById('ticker').innerHTML = t.ticker;
     document.getElementById('emptyText').innerHTML = t.empty;
+    
+    // Update stat labels
+    document.getElementById('stat-label-articles').textContent = t.statLabels.articles;
+    document.getElementById('stat-label-searches').textContent = t.statLabels.searches;
+    document.getElementById('stat-label-shared').textContent = t.statLabels.shared;
+    document.getElementById('stat-label-online').textContent = t.statLabels.online;
   }
 
   function toggleLang() {
     lang = lang === 'hi' ? 'en' : 'hi';
     applyLang();
+    playSound('click');
+  }
+
+  function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    playSound('click');
   }
 
   function setPrompt(text) {
     document.getElementById('promptInput').value = text;
     document.getElementById('promptInput').focus();
+    playSound('click');
   }
+
+  function incrementStat(type) {
+    stats[type]++;
+    document.getElementById(`stat-${type}`).textContent = stats[type];
+    playSound('click');
+  }
+
+  function filterNews() {
+    const searchTerm = document.getElementById('searchFilter').value.toLowerCase();
+    const cards = document.querySelectorAll('.news-card');
+    let visible = 0;
+
+    cards.forEach(card => {
+      const title = card.querySelector('.card-title').textContent.toLowerCase();
+      const body = card.querySelector('.card-body').textContent.toLowerCase();
+      const tag = card.querySelector('.card-tag').textContent.toLowerCase();
+
+      if (title.includes(searchTerm) || body.includes(searchTerm) || tag.includes(searchTerm)) {
+        card.style.display = 'block';
+        visible++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    if (visible === 0 && searchTerm) {
+      document.getElementById('newsOutput').innerHTML = `<div class="empty-state"><div class="big">🔍</div><p>कोई खबर नहीं मिली</p></div>`;
+    }
+  }
+
+  document.getElementById('searchFilter').addEventListener('input', filterNews);
 
   async function fetchNews() {
     const prompt = document.getElementById('promptInput').value.trim();
     const t = ui[lang];
-    if (!prompt) { alert(t.alert); return; }
+    if (!prompt) { alert(t.alert); playSound('error'); return; }
 
-    const btn = document.getElementById('runBtn');
+    const btn = document.getElementById('runBtn2');
     const output = document.getElementById('newsOutput');
     const label = document.getElementById('sectionLabel');
 
     btn.disabled = true;
     btn.textContent = t.loadingBtn;
     label.textContent = t.loading;
-    output.innerHTML = `<div class="loading-box">${t.loadingBox}</div>`;
+    output.innerHTML = `<div class="loading-box"><div class="loading-spinner"></div>${t.loadingBox}</div>`;
+
+    playSound('click');
 
     try {
       const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -477,12 +926,17 @@
       if (start === -1 || end === -1) throw new Error('JSON array not found.');
       const articles = JSON.parse(raw.slice(start, end + 1));
 
+      stats.articles += articles.length;
+      stats.searches++;
+      document.getElementById('stat-articles').textContent = stats.articles;
+      document.getElementById('stat-searches').textContent = stats.searches;
+
       const shortPrompt = prompt.slice(0, 50) + (prompt.length > 50 ? '…' : '');
       label.textContent = t.found(articles.length, shortPrompt);
 
       output.innerHTML = `<div class="news-grid">${
         articles.map((a, i) => `
-          <div class="news-card" style="animation-delay:${i*0.08}s">
+          <div class="news-card" style="animation-delay:${i*0.08}s" onmousemove="updateGradient(event, this)">
             <div class="card-tag">${a.tag || 'NEWS'}</div>
             <div class="card-title">${a.headline}</div>
             <div class="card-body">${a.summary}</div>
@@ -490,22 +944,59 @@
               <span>📡 ${a.source || 'News Wire'}</span>
               <span>🕐 ${a.time || '—'}</span>
             </div>
+            <div class="card-actions">
+              <button class="share-btn" onclick="shareNews('${a.headline.replace(/'/g, "\\'")}', event)">📤 Share</button>
+              <button class="share-btn" onclick="copyNews('${a.headline.replace(/'/g, "\\'")}', event)">📋 Copy</button>
+            </div>
           </div>
         `).join('')
       }</div>`;
 
+      playSound('success');
+
     } catch (err) {
       label.textContent = t.errLabel;
       output.innerHTML = `<div class="error-box">⚠ ${t.errMsg}<br><small style="opacity:0.6">${err.message}</small></div>`;
+      playSound('error');
     } finally {
       btn.disabled = false;
       btn.textContent = t.runBtn;
     }
   }
 
-  // Ctrl+Enter shortcut
+  function updateGradient(event, card) {
+    const rect = card.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    card.style.setProperty('--mx', (x / rect.width) * 100 + '%');
+    card.style.setProperty('--my', (y / rect.height) * 100 + '%');
+  }
+
+  function shareNews(headline, event) {
+    event.stopPropagation();
+    const text = `📰 ${headline}\n\nVia Flash24 - AI News Digest`;
+    if (navigator.share) {
+      navigator.share({ title: 'News', text: text });
+    } else {
+      alert('Share: ' + text);
+    }
+    stats.shared++;
+    document.getElementById('stat-shared').textContent = stats.shared;
+    playSound('success');
+  }
+
+  function copyNews(headline, event) {
+    event.stopPropagation();
+    navigator.clipboard.writeText(headline).then(() => {
+      alert('✓ कॉपी हो गया!');
+      playSound('success');
+    });
+  }
+
+  // Keyboard shortcuts
   document.getElementById('promptInput').addEventListener('keydown', e => {
-    if (e.ctrlKey && e.key === 'Enter') fetchNews();
+    if (e.ctrlKey && e.key === 'Enter') { fetchNews(); }
+    if (e.key === 'Escape') { document.getElementById('promptInput').value = ''; }
   });
 
   applyLang();
