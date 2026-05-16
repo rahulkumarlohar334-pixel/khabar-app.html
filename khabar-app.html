@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="hi" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>समाचार नामा — Samachar Nama</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --ink: #ffffff;
+    --paper: #0a0f1e;
+    --accent: #00aaff;
+    --gold: #38bdf8;
+    --muted: #94a3b8;
+    --border: #1e3a5f;
+    --card-bg: #0f1f3d;
+    --glow: 0 0 18px rgba(0,170,255,0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Mono', monospace;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(0,100,255,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(0,200,255,0.08) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(0,150,255,0.04) 28px);
+  }
+
+  header {
+    border-bottom: 2px solid var(--border);
+    padding: 18px 32px 12px;
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    background: rgba(10,15,30,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 24px rgba(0,120,255,0.15);
+  }
+
+  .masthead {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .masthead span { color: var(--accent); text-shadow: 0 0 20px rgba(0,170,255,0.7); }
+
+  .tagline {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-left: auto;
+    text-align: right;
+    line-height: 1.6;
+  }
+
+  .main-layout {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: 28px;
+  }
+
+  .prompt-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    padding: 22px 24px;
+    position: relative;
+    box-shadow: var(--glow);
+  }
+
+  .prompt-box::before {
+    content: '⬛ प्रॉम्प्ट कंसोल';
+    font-size: 0.6rem;
+    letter-spacing: 4px;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #1e3a5f;
+    padding-bottom: 8px;
+  }
+
+  .prompt-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  textarea {
+    flex: 1;
+    background: rgba(0,20,50,0.5);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    padding: 10px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    color: #e2f0ff;
+    resize: vertical;
+    min-height: 70px;
+    outline: none;
+    line-height: 1.6;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  textarea:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(0,170,255,0.2); }
+  textarea::placeholder { color: #3a5a7a; }
+
+  .run-btn {
+    background: linear-gradient(135deg, #0070cc, #00aaff);
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    height: 44px;
+    align-self: flex-end;
+    box-shadow: 0 0 16px rgba(0,150,255,0.4);
+  }
+  .run-btn:hover { background: linear-gradient(135deg, #0088ff, #00ccff); box-shadow: 0 0 28px rgba(0,180,255,0.6); }
+  .run-btn:active { transform: scale(0.97); }
+  .run-btn:disabled { background: #1a3a5a; box-shadow: none; cursor: wait; }
+
+  .section-label {
+    font-size: 0.6rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding: 5px 0;
+    margin-bottom: 0;
+  }
+
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .news-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    padding: 18px 18px 14px;
+    animation: fadeSlide 0.4s ease both;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .news-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(0,150,255,0.2);
+  }
+
+  .news-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+  .news-card:hover::after { transform: scaleX(1); }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-tag {
+    font-size: 0.55rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+
+  .card-body {
+    font-size: 0.78rem;
+    line-height: 1.7;
+    color: #94b8d8;
+  }
+
+  .card-footer {
+    margin-top: 12px;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .loading-box {
+    text-align: center;
+    padding: 50px 20px;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+
+  .error-box {
+    background: rgba(0,50,100,0.4);
+    border: 1px solid var(--accent);
+    padding: 16px 20px;
+    font-size: 0.8rem;
+    color: var(--accent);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .empty-state .big { font-size: 2.5rem; margin-bottom: 10px; }
+  .empty-state p { font-size: 0.78rem; letter-spacing: 1px; line-height: 1.8; color: #3a6a9a; }
+
+  .presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .preset-chip {
+    background: transparent;
+    border: 1px solid #1e4a70;
+    padding: 4px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.15s;
+    letter-spacing: 0.5px;
+  }
+  .preset-chip:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,150,255,0.08); box-shadow: 0 0 8px rgba(0,150,255,0.2); }
+
+  .ticker-wrap {
+    overflow: hidden;
+    background: linear-gradient(90deg, #001f4d, #003a8c, #001f4d);
+    color: #7dd3fc;
+    padding: 5px 0;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+  }
+  .ticker-inner {
+    display: inline-block;
+    white-space: nowrap;
+    animation: scroll-ticker 25s linear infinite;
+  }
+  @keyframes scroll-ticker {
+    from { transform: translateX(100vw); }
+    to   { transform: translateX(-100%); }
+  }
+
+  @media (max-width: 600px) {
+    header { flex-wrap: wrap; gap: 8px; }
+    .tagline { margin-left: 0; text-align: left; }
+    .prompt-row { flex-direction: column; }
+    .run-btn { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ticker-wrap">
+  <span class="ticker-inner" id="ticker">
+    🌍 समाचार नामा — दुनिया की ताज़ा खबरें &nbsp;|&nbsp; AI-Powered News Engine &nbsp;|&nbsp; अपना प्रॉम्प्ट लिखें और खबरें पाएं &nbsp;|&nbsp; World · Politics · Science · Tech · Sports &nbsp;|&nbsp; ✦ ✦ ✦
+  </span>
+</div>
+
+<header>
+  <div>
+    <div class="masthead" id="mastheadText">समाचार<span> नामा</span></div>
+    <div style="font-size:0.7rem;color:var(--muted);letter-spacing:2px;margin-top:3px;" id="mastheadSub">SAMACHAR NAMA</div>
+  </div>
+  <div class="tagline">
+    AI — Powered<br>
+    NEWS DIGEST<br>
+    <span id="dateline">—</span>
+  </div>
+  <button id="langBtn" onclick="toggleLang()" style="margin-left:auto;background:transparent;border:1px solid var(--accent);color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:0.72rem;padding:7px 16px;cursor:pointer;letter-spacing:1px;transition:all 0.2s;white-space:nowrap;">🇮🇳 हिंदी</button>
+</header>
+
+<div class="main-layout">
+
+  <!-- Prompt Console -->
+  <div class="prompt-box">
+    <div class="prompt-row">
+      <textarea id="promptInput" rows="3" placeholder="यहाँ अपना प्रॉम्प्ट लिखें..."></textarea>
+      <button class="run-btn" id="runBtn" onclick="fetchNews()">▶ चलाएं</button>
+    </div>
+    <div class="presets">
+      <span id="quickLabel" style="font-size:0.6rem;color:var(--muted);letter-spacing:2px;align-self:center;">त्वरित: </span>
+      <button class="preset-chip" onclick="setPrompt(presets[lang][0])">🌍 World Top 8</button>
+      <button class="preset-chip" onclick="setPrompt(presets[lang][1])">💻 Tech & AI</button>
+      <button class="preset-chip" onclick="setPrompt(presets[lang][2])">🇮🇳 India</button>
+      <button class="preset-chip" onclick="setPrompt(presets[lang][3])">🌱 Climate</button>
+      <button class="preset-chip" onclick="setPrompt(presets[lang][4])">⚽ Sports</button>
+      <button class="preset-chip" onclick="setPrompt(presets[lang][5])">🚀 Science</button>
+    </div>
+  </div>
+
+  <!-- Section Label -->
+  <div class="section-label" id="sectionLabel">⬛ प्रतीक्षा करें — प्रॉम्प्ट लिखें और खबरें पाएं</div>
+
+  <!-- Output Area -->
+  <div id="newsOutput">
+    <div class="empty-state">
+      <div class="big">📰</div>
+      <p id="emptyText">अपना सवाल या topic ऊपर लिखें<br>और "चलाएं" दबाएं।<br><br>AI दुनिया भर की खबरें आपके लिए तैयार करेगा।</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  var lang = 'hi';
+
+  var presets = {
+    hi: [
+      'आज की 8 बड़ी world news दो, हर खबर में headline, summary और region बताओ',
+      'Technology और AI की 5 ताज़ा खबरें — innovation और नया product',
+      'भारत की 6 अहम खबरें आज की — politics, economy, society',
+      'Climate change और environment की 5 ताज़ा खबरें globally',
+      'Sports की 6 खबरें — cricket, football, Olympics वगैरा',
+      'विज्ञान और अंतरिक्ष की 5 ताज़ा खबरें'
+    ],
+    en: [
+      'Give me the top 8 world news today with headline, summary and region',
+      'Latest 5 news on Technology and AI — innovations and new products',
+      'Top 6 news from India today — politics, economy, society',
+      'Latest 5 global news on climate change and environment',
+      'Top 6 sports news — cricket, football, Olympics etc',
+      'Latest 5 science and space news'
+    ]
+  };
+
+  const ui = {
+    hi: {
+      masthead: 'समाचार<span> नामा</span>',
+      sub: 'SAMACHAR NAMA',
+      langBtn: '🇬🇧 English',
+      placeholder: 'यहाँ अपना प्रॉम्प्ट लिखें... जैसे: आज की 6 बड़ी खबरें दो',
+      runBtn: '▶ चलाएं',
+      quickLabel: 'त्वरित: ',
+      sectionDefault: '⬛ प्रतीक्षा करें — प्रॉम्प्ट लिखें और खबरें पाएं',
+      loading: '⬛ खबरें तैयार हो रही हैं...',
+      loadingBox: 'खबरें fetch हो रही हैं — कृपया प्रतीक्षा करें...',
+      loadingBtn: '⏳ लोड हो रहा है...',
+      empty: 'अपना सवाल या topic ऊपर लिखें<br>और "चलाएं" दबाएं।<br><br>AI दुनिया भर की खबरें आपके लिए तैयार करेगा।',
+      alert: 'पहले अपना प्रॉम्प्ट लिखें!',
+      found: (n, p) => `⬛ ${n} खबरें मिलीं — Topic: "${p}"`,
+      errLabel: '⬛ खबरें लाने में समस्या हुई',
+      errMsg: 'खबरें लाने में समस्या हुई। दोबारा कोशिश करें।',
+      ticker: '🌍 समाचार नामा — दुनिया की ताज़ा खबरें &nbsp;|&nbsp; AI-Powered News Engine &nbsp;|&nbsp; अपना प्रॉम्प्ट लिखें और खबरें पाएं &nbsp;|&nbsp; World · Politics · Science · Tech · Sports &nbsp;|&nbsp; ✦ ✦ ✦',
+      systemPrompt: `You are a Hindi news generator. Respond with ONLY a valid JSON array, no markdown, no explanation. Each item: tag (Hindi category), headline (Hindi), summary (Hindi, 2-3 sentences), source (known agency), time (e.g. 2 घंटे पहले). Return 4-6 items. Example: [{"tag":"विश्व","headline":"...","summary":"...","source":"NDTV","time":"1 घंटे पहले"}]`
+    },
+    en: {
+      masthead: 'Samachar<span> Nama</span>',
+      sub: 'WORLD NEWS DIGEST',
+      langBtn: '🇮🇳 हिंदी',
+      placeholder: 'Type your prompt here... e.g. Give me top 6 world news today',
+      runBtn: '▶ GO',
+      quickLabel: 'QUICK: ',
+      sectionDefault: '⬛ WAITING — WRITE A PROMPT AND GET NEWS',
+      loading: '⬛ Fetching news...',
+      loadingBox: 'Loading news — please wait...',
+      loadingBtn: '⏳ Loading...',
+      empty: 'Write your question or topic above<br>and press GO.<br><br>AI will prepare world news for you.',
+      alert: 'Please write your prompt first!',
+      found: (n, p) => `⬛ ${n} articles found — Topic: "${p}"`,
+      errLabel: '⬛ Error fetching news',
+      errMsg: 'Could not fetch news. Please try again.',
+      ticker: '🌍 SAMACHAR NAMA — World News In Your Language &nbsp;|&nbsp; AI-Powered News Engine &nbsp;|&nbsp; Type a prompt and get news &nbsp;|&nbsp; World · Politics · Science · Tech · Sports &nbsp;|&nbsp; ✦ ✦ ✦',
+      systemPrompt: `You are an English news generator. Respond with ONLY a valid JSON array, no markdown, no explanation. Each item: tag (category in English), headline (English), summary (English, 2-3 sentences), source (known agency like Reuters/AP/BBC), time (e.g. 2 hours ago). Return 4-6 items. Example: [{"tag":"WORLD","headline":"...","summary":"...","source":"Reuters","time":"1 hour ago"}]`
+    }
+  };
+
+  // Date
+  const now = new Date();
+  document.getElementById('dateline').textContent =
+    now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }).toUpperCase();
+
+  function applyLang() {
+    const t = ui[lang];
+    document.getElementById('mastheadText').innerHTML = t.masthead;
+    document.getElementById('mastheadSub').textContent = t.sub;
+    document.getElementById('langBtn').textContent = t.langBtn;
+    document.getElementById('promptInput').placeholder = t.placeholder;
+    document.getElementById('runBtn').textContent = t.runBtn;
+    document.getElementById('quickLabel').textContent = t.quickLabel;
+    document.getElementById('sectionLabel').textContent = t.sectionDefault;
+    document.getElementById('ticker').innerHTML = t.ticker;
+    document.getElementById('emptyText').innerHTML = t.empty;
+  }
+
+  function toggleLang() {
+    lang = lang === 'hi' ? 'en' : 'hi';
+    applyLang();
+  }
+
+  function setPrompt(text) {
+    document.getElementById('promptInput').value = text;
+    document.getElementById('promptInput').focus();
+  }
+
+  async function fetchNews() {
+    const prompt = document.getElementById('promptInput').value.trim();
+    const t = ui[lang];
+    if (!prompt) { alert(t.alert); return; }
+
+    const btn = document.getElementById('runBtn');
+    const output = document.getElementById('newsOutput');
+    const label = document.getElementById('sectionLabel');
+
+    btn.disabled = true;
+    btn.textContent = t.loadingBtn;
+    label.textContent = t.loading;
+    output.innerHTML = `<div class="loading-box">${t.loadingBox}</div>`;
+
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1500,
+          system: t.systemPrompt,
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+
+      const data = await response.json();
+      if (data.error) throw new Error(data.error.message);
+
+      const raw = data.content?.map(b => b.text || '').join('') || '';
+      const start = raw.indexOf('[');
+      const end = raw.lastIndexOf(']');
+      if (start === -1 || end === -1) throw new Error('JSON array not found.');
+      const articles = JSON.parse(raw.slice(start, end + 1));
+
+      const shortPrompt = prompt.slice(0, 50) + (prompt.length > 50 ? '…' : '');
+      label.textContent = t.found(articles.length, shortPrompt);
+
+      output.innerHTML = `<div class="news-grid">${
+        articles.map((a, i) => `
+          <div class="news-card" style="animation-delay:${i*0.08}s">
+            <div class="card-tag">${a.tag || 'NEWS'}</div>
+            <div class="card-title">${a.headline}</div>
+            <div class="card-body">${a.summary}</div>
+            <div class="card-footer">
+              <span>📡 ${a.source || 'News Wire'}</span>
+              <span>🕐 ${a.time || '—'}</span>
+            </div>
+          </div>
+        `).join('')
+      }</div>`;
+
+    } catch (err) {
+      label.textContent = t.errLabel;
+      output.innerHTML = `<div class="error-box">⚠ ${t.errMsg}<br><small style="opacity:0.6">${err.message}</small></div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = t.runBtn;
+    }
+  }
+
+  // Ctrl+Enter shortcut
+  document.getElementById('promptInput').addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key === 'Enter') fetchNews();
+  });
+
+  applyLang();
+</script>
+</body>
+</html>
